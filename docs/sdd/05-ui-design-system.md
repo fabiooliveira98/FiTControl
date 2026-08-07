@@ -52,4 +52,13 @@ Os tokens em `src/app/globals.css` sao a fonte tecnica das cores ajustadas no pr
 - o toque no cartao abre acoes em `BottomSheet`, sem drag-and-drop
 - alvos interativos principais possuem pelo menos 44px de altura
 
+## Interface publica
+
+- `components/marketing` concentra cabecalho, previa da agenda, beneficios e rodape
+- a landing apresenta problema, solucao e uso pratico sem mencionar implementacao interna
+- a previa animada da agenda demonstra remanejamento, andamento e horarios livres
+- o login aparece primeiro no mobile e usa composicao dividida no desktop
+- movimentos usam entrada escalonada e flutuacao leve, respeitando `prefers-reduced-motion`
+- botoes lilases usam texto escuro para manter contraste
+
 Componentes de dominio ficam em `src/components/<feature>`; somente pecas sem regra de negocio entram em `src/components/ui`.

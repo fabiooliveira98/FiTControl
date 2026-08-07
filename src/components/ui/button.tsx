@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -54,8 +54,9 @@ export function ButtonLink({
   variant = "primary",
   size = "md",
   className,
+  style,
   children,
-}: BaseProps & { href: string }) {
+}: BaseProps & { href: string; style?: CSSProperties }) {
   return (
     <Link
       href={href}
@@ -65,6 +66,7 @@ export function ButtonLink({
         sizeClasses[size],
         className,
       )}
+      style={style}
     >
       {children}
     </Link>
