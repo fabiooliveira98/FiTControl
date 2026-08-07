@@ -14,7 +14,7 @@ const estadoInicial: EstadoLogin = {};
 function SubmitButton() {
   const { pending } = useFormStatus();
 
-  return <Button type="submit">{pending ? "Entrando..." : "Entrar"}</Button>;
+  return <Button type="submit" className="w-full">{pending ? "Entrando..." : "Entrar"}</Button>;
 }
 
 export function LoginForm() {

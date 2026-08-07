@@ -20,6 +20,8 @@
 - remanejamento pontual confirmado sem entrar na fila de pendencias
 - finalizacao manual, encerramento do dia e conclusao automatica de dias anteriores
 - navegacao movel fixa e menu lateral completo no desktop
+- landing comercial responsiva com proposta de valor e previa animada da agenda
+- login integrado a identidade comercial, com formulario prioritario no mobile
 
 ## Banco
 

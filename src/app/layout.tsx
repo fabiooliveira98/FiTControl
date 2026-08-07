@@ -4,7 +4,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "FitControl",
-  description: "Sistema de agenda, reposições e gestão operacional para personal trainer.",
+  description:
+    "Agenda inteligente para personal trainers organizarem aulas, cancelamentos e reposições.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
