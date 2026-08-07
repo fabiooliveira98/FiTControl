@@ -16,6 +16,7 @@ import type {
 } from "@/types/dominio";
 import type {
   DetalheAula,
+  OpcoesRemanejamento,
   ReposicaoPendente,
   SugestaoReposicao,
 } from "@/features/reposicoes/types";
@@ -80,6 +81,10 @@ async function buscarContextoSugestoes(): Promise<ContextoSugestoes> {
   const supabase = await createSupabaseServerClient();
   const inicio = obterDataAtualSaoPaulo();
   const fim = somarDias(inicio, 45);
+  await supabase.rpc("materializar_aulas_periodo", {
+    p_data_inicio: inicio,
+    p_data_fim: fim,
+  });
   const [disponibilidades, bloqueios, aberturas, aulas, grupos] = await Promise.all([
     supabase.from("disponibilidade_semanal").select("*").eq("ativo", true),
     supabase
@@ -126,11 +131,21 @@ async function buscarContextoSugestoes(): Promise<ContextoSugestoes> {
 
 function gerarSugestoes(
   contexto: ContextoSugestoes,
-  alunoId: string,
+  alunoIds: string[],
   aulaOriginal: Aula,
 ): SugestaoReposicao[] {
   const sugestoes: SugestaoReposicao[] = [];
   const grupoPorId = new Map(contexto.grupos.map((grupo) => [grupo.id, grupo]));
+  const quantidade = alunoIds.length;
+  const capacidadeNova = aulaOriginal.grupo_aula_id
+    ? grupoPorId.get(aulaOriginal.grupo_aula_id)?.capacidade_maxima ?? 3
+    : 3;
+  const horarioAtual = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date());
 
   for (let data = contexto.inicio; data <= contexto.fim; data = somarDias(data, 1)) {
     const diaSemana = obterDiaSemana(data);
@@ -147,6 +162,7 @@ function gerarSugestoes(
     for (const disponibilidade of disponibilidadesDia) {
       const horario = formatarHorario(disponibilidade.horario_inicio);
       const horarioFim = formatarHorario(disponibilidade.horario_fim);
+      if (data === contexto.inicio && horario <= horarioAtual) continue;
       if (data === aulaOriginal.data && horario === formatarHorario(aulaOriginal.horario_inicio)) {
         continue;
       }
@@ -179,10 +195,11 @@ function gerarSugestoes(
         contexto.participacoes.some(
           (participacao) =>
             participacao.aula_id === aula.id &&
-            participacao.aluno_id === alunoId &&
+            alunoIds.includes(participacao.aluno_id) &&
             !contexto.cancelamentos.some(
               (cancelamento) =>
-                cancelamento.aula_id === aula.id && cancelamento.aluno_id === alunoId,
+                cancelamento.aula_id === aula.id &&
+                cancelamento.aluno_id === participacao.aluno_id,
             ),
         ),
       );
@@ -192,16 +209,25 @@ function gerarSugestoes(
         (aula) => formatarHorario(aula.horario_inicio) === horario,
       );
 
+      const alunoJaParticipouDoSlot = aulasDoSlot.some((aula) =>
+        contexto.participacoes.some(
+          (participacao) =>
+            participacao.aula_id === aula.id &&
+            alunoIds.includes(participacao.aluno_id),
+        ),
+      );
+      if (alunoJaParticipouDoSlot) continue;
+
       if (aulasSobrepostas.length > 0 && aulasDoSlot.length === 0) continue;
 
-      if (!aulasDoSlot.length) {
+      if (!aulasDoSlot.length && quantidade <= capacidadeNova) {
         sugestoes.push({
           chave: `${data}|${horario}`,
           data,
           horario_inicio: horario,
           horario_fim: horarioFim,
           ocupacao: 0,
-          capacidade: 3,
+          capacidade: capacidadeNova,
         });
         if (sugestoes.length >= 8) return sugestoes;
         continue;
@@ -223,7 +249,7 @@ function gerarSugestoes(
             : 3;
           return { aula, ocupacao, capacidade };
         })
-        .find((item) => item.ocupacao < item.capacidade);
+        .find((item) => item.ocupacao + quantidade <= item.capacidade);
 
       if (aulaComVaga) {
         sugestoes.push({
@@ -240,6 +266,51 @@ function gerarSugestoes(
   }
 
   return sugestoes;
+}
+
+export async function buscarOpcoesRemanejamento(
+  aulaId: string,
+  alunoIds: string[],
+): Promise<OpcoesRemanejamento | null> {
+  const aula = await buscarDetalheAula(aulaId);
+  if (!aula) return null;
+
+  const idsUnicos = Array.from(new Set(alunoIds));
+  const participantes = aula.participantes.filter((participante) =>
+    idsUnicos.includes(participante.id),
+  );
+  if (!idsUnicos.length || participantes.length !== idsUnicos.length) {
+    return {
+      aula,
+      aluno_ids: idsUnicos,
+      sugestoes: [],
+      impedimento: "Selecione participantes validos desta aula.",
+    };
+  }
+  if (participantes.some((participante) => participante.cancelamento)) {
+    return {
+      aula,
+      aluno_ids: idsUnicos,
+      sugestoes: [],
+      impedimento: "Um dos participantes selecionados ja saiu desta aula.",
+    };
+  }
+  if (participantes.some((participante) => participante.treina_segunda_a_sexta)) {
+    return {
+      aula,
+      aluno_ids: idsUnicos,
+      sugestoes: [],
+      impedimento:
+        "Aluno 5x segue a regra de ajuste financeiro e nao possui remanejamento padrao.",
+    };
+  }
+
+  const contexto = await buscarContextoSugestoes();
+  return {
+    aula,
+    aluno_ids: idsUnicos,
+    sugestoes: gerarSugestoes(contexto, idsUnicos, aula),
+  };
 }
 
 export async function buscarReposicoesPendentes(
@@ -293,7 +364,7 @@ export async function buscarReposicoesPendentes(
         cancelamento,
         aula_original: aulaOriginal,
         aluno,
-        sugestoes: gerarSugestoes(contexto, aluno.id, aulaOriginal),
+        sugestoes: gerarSugestoes(contexto, [aluno.id], aulaOriginal),
       },
     ];
   });

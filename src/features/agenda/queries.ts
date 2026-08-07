@@ -153,6 +153,7 @@ export async function buscarAgendaOperacional(
     p_data_inicio: intervalo.inicio,
     p_data_fim: intervalo.fim,
   });
+  const { error: erroFinalizacao } = await supabase.rpc("finalizar_aulas_anteriores");
 
   const [disponibilidades, bloqueios, aberturas, aulas, grupos] = await Promise.all([
     supabase
@@ -208,7 +209,7 @@ export async function buscarAgendaOperacional(
     idsAulas.length
       ? supabase
           .from("cancelamentos")
-          .select("aula_id,aluno_id,motivo")
+          .select("aula_id,aluno_id,motivo,tipo")
           .in("aula_id", idsAulas)
       : Promise.resolve({ data: [], error: null }),
   ]);
@@ -224,7 +225,10 @@ export async function buscarAgendaOperacional(
   const cancelamentoPorParticipacao = new Map(
     (cancelamentos.data ?? []).map((item) => [
       `${item.aula_id}|${item.aluno_id}`,
-      item.motivo as string | null,
+      {
+        motivo: item.motivo as string | null,
+        tipo: item.tipo as ParticipanteAgenda["tipo_cancelamento"],
+      },
     ]),
   );
 
@@ -239,7 +243,10 @@ export async function buscarAgendaOperacional(
           nome: aluno?.nome ?? "Aluno removido",
           treina_segunda_a_sexta: aluno?.treina_segunda_a_sexta ?? false,
           cancelado: cancelamentoPorParticipacao.has(chaveCancelamento),
-          motivo_cancelamento: cancelamentoPorParticipacao.get(chaveCancelamento) ?? null,
+          motivo_cancelamento:
+            cancelamentoPorParticipacao.get(chaveCancelamento)?.motivo ?? null,
+          tipo_cancelamento:
+            cancelamentoPorParticipacao.get(chaveCancelamento)?.tipo ?? null,
         };
       });
 
@@ -368,7 +375,8 @@ export async function buscarAgendaOperacional(
     total_aulas: dias.reduce((total, dia) => total + dia.total_aulas, 0),
     total_livres: dias.reduce((total, dia) => total + dia.total_livres, 0),
     total_bloqueados: dias.reduce((total, dia) => total + dia.total_bloqueados, 0),
-    sincronizada: !erroAlteracoes && !erroSincronizacao && !erroLeitura,
+    sincronizada:
+      !erroAlteracoes && !erroSincronizacao && !erroFinalizacao && !erroLeitura,
     mensagemErro: erroAlteracoes
       ? erroAlteracoes.message.includes("schema cache") || erroAlteracoes.message.includes("function")
         ? "A migration das Fases 8 e 9 ainda precisa ser aplicada no Supabase."
@@ -378,6 +386,11 @@ export async function buscarAgendaOperacional(
         erroSincronizacao.message.includes("outra aula")
         ? "Existem rotinas antigas em conflito. Execute a migration de reparo da agenda."
         : `As aulas recorrentes nao puderam ser atualizadas: ${erroSincronizacao.message}`
+      : erroFinalizacao
+        ? erroFinalizacao.message.includes("schema cache") ||
+          erroFinalizacao.message.includes("function")
+          ? "A migration do painel diario ainda precisa ser aplicada no Supabase."
+          : `As aulas anteriores nao puderam ser finalizadas: ${erroFinalizacao.message}`
       : erroLeitura
         ? `Nao foi possivel ler a agenda: ${erroLeitura.message}`
         : undefined,

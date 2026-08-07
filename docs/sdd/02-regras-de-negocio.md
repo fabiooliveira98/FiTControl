@@ -34,6 +34,7 @@
 - a lotacao maxima absoluta e 3 alunos
 - edicao cadastral comum nao altera a rotina do aluno
 - mudanca permanente usa fluxo proprio com data de vigencia futura
+- uma mudanca permanente pode usar a data atual para ser aplicada imediatamente
 - a rotina atual permanece valida ate o dia anterior a nova vigencia
 - mudancas aplicadas desativam a versao anterior sem excluir seus registros
 - mudancas agendadas podem ser canceladas antes da data de vigencia
@@ -41,17 +42,21 @@
 
 ## Dashboard
 
-- aulas acompanham o periodo selecionado: semana ou mes
-- livres e bloqueados usam a semana de referencia para apoiar encaixes
-- aberturas pontuais entram na contagem da data correspondente
+- `/painel` abre sempre no dia atual quando nenhuma data e informada
+- o painel lista aulas em ordem cronologica e mantem horarios livres recolhidos
+- dias anteriores e futuros da mesma semana podem ser consultados sem sair do painel
+- a proxima aula, aulas restantes, horarios livres e reposicoes pendentes aparecem no resumo
+- a organizacao ampla da semana e do mes permanece em `/agenda`
 - reposicoes pendentes sao globais e ordenadas por aluno com maior quantidade
 
 ## Cancelamentos
 
 - o cancelamento ocorre por aluno, sem cancelar automaticamente os colegas da dupla ou trio
+- em dupla ou trio a personal pode selecionar um participante ou o grupo inteiro
 - o motivo e opcional e limitado a 240 caracteres
 - a aula inteira so recebe status cancelado quando nao restar participante confirmado
 - aluno de segunda a sexta nao gera reposicao padrao e segue para ajuste financeiro
+- cancelamentos comuns usam tipo `FALTA`; saidas por remanejamento usam `REMANEJAMENTO`
 
 ## Reposicoes
 
@@ -61,6 +66,26 @@
 - sao exibidas ate 8 sugestoes validas nos proximos 45 dias
 - confirmar uma sugestao inclui o aluno na aula de destino e resolve a pendencia
 - uma pendencia tambem pode ser dispensada e direcionada para ajuste financeiro
+
+## Remanejamento pontual
+
+- remanejamento pontual nao altera a rotina recorrente do aluno
+- a personal pode mover um participante ou todos os participantes ativos da aula
+- o destino deve ser futuro, estar disponivel e nao pode cruzar bloqueios ou outras aulas
+- o destino precisa ter capacidade para todos os participantes selecionados
+- nenhum aluno selecionado pode possuir conflito ou historico na aula de destino
+- a origem registra cancelamento do tipo `REMANEJAMENTO`
+- o destino registra uma reposicao `CONFIRMADA`, sem entrar na fila de pendencias
+- alunos 5x nao recebem remanejamento padrao e continuam na regra financeira
+- aulas concluidas aceitam cancelamento e remanejamento retroativo
+
+## Finalizacao de aulas
+
+- finalizar uma aula atua sobre o encontro inteiro, inclusive em dupla ou trio
+- finalizar o dia conclui todas as aulas ainda agendadas ou repostas da data
+- aulas de dias anteriores sao concluidas automaticamente na proxima abertura autenticada
+- a finalizacao automatica nao depende de cron
+- finalizacao manual e automatica ficam diferenciadas no historico da aula
 
 ## Financeiro
 

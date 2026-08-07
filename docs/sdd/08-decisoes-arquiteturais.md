@@ -56,3 +56,17 @@
 - decisao: semear todos os inicios validos, aplicar uma faixa semanal em lote e separar aberturas/bloqueios pontuais da rotina
 - impacto: o onboarding fica rapido, horarios nunca precisam ser recriados e um almoco pode ser aberto em uma unica data
 - limite do MVP: o catalogo termina em `22:30` para que sessoes de uma hora nao atravessem a meia-noite
+
+## DA-009 - Painel diario e remanejamento resolvido
+
+- data: 07/08/2026
+- contexto: durante o atendimento, a personal precisa agir sobre a aula atual com poucos toques
+- decisao: `/painel` prioriza o dia; semana/mes ficam em `/agenda`; remanejamento pontual registra origem e destino no mesmo fluxo
+- impacto: a operacao movel fica direta e remanejamentos confirmados nao poluem a fila de pendencias
+
+## DA-010 - Finalizacao tardia sem cron
+
+- data: 07/08/2026
+- contexto: a personal pode esquecer de finalizar aulas ou encerrar o dia
+- decisao: concluir aulas anteriores na proxima abertura autenticada e manter botao manual para o dia atual
+- impacto: o historico converge sem infraestrutura de agendamento e continua aceitando correcoes retroativas

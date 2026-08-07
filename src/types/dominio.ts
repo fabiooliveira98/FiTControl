@@ -13,6 +13,7 @@ export type StatusReposicao = "PENDENTE" | "CONFIRMADA" | "CONCLUIDA" | "DISPENS
 export type TipoAula = "INDIVIDUAL" | "DUPLA" | "TRIO";
 export type StatusAula = "AGENDADA" | "CANCELADA" | "REPOSTA" | "CONCLUIDA";
 export type StatusAlteracaoRotina = "AGENDADA" | "APLICADA" | "CANCELADA";
+export type TipoCancelamento = "FALTA" | "REMANEJAMENTO";
 
 export type Aluno = {
   id: string;
@@ -112,6 +113,8 @@ export type Aula = {
   status: StatusAula;
   origem: string;
   observacoes: string | null;
+  finalizada_em: string | null;
+  finalizacao_automatica: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -122,6 +125,7 @@ export type Cancelamento = {
   aluno_id: string | null;
   motivo: string | null;
   ajustado_financeiro: boolean;
+  tipo: TipoCancelamento;
   created_at: string;
 };
 

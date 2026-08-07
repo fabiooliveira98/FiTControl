@@ -38,6 +38,7 @@ export function FormularioAlteracaoRotina({
     }),
   ) as SelecaoRotina;
   const [selecionados, setSelecionados] = useState(selecaoInicial);
+  const [dataVigencia, setDataVigencia] = useState(dataMinima);
   const [estado, action, pendente] = useActionState(
     programarAlteracaoRotinaAction.bind(null, aluno.id),
     estadoInicialAlteracaoRotina,
@@ -60,12 +61,20 @@ export function FormularioAlteracaoRotina({
       <input type="hidden" name="rotinas" value={JSON.stringify(rotinas)} />
 
       <div className="grid gap-4 md:grid-cols-[0.8fr_1.2fr]">
-        <Field label="Comecar em" hint="A rotina atual continua valendo ate o dia anterior.">
+        <Field
+          label="Aplicar em"
+          hint={
+            dataVigencia === dataMinima
+              ? "A mudanca sera aplicada assim que voce salvar."
+              : "A rotina atual continua valendo ate o dia anterior."
+          }
+        >
           <Input
             type="date"
             name="data_vigencia"
             min={dataMinima}
-            defaultValue={dataMinima}
+            value={dataVigencia}
+            onChange={(evento) => setDataVigencia(evento.target.value)}
             required
             disabled={pendente}
           />
@@ -93,7 +102,11 @@ export function FormularioAlteracaoRotina({
 
       <div className="flex justify-end border-t border-border pt-5">
         <Button type="submit" disabled={pendente || !rotinas.length}>
-          {pendente ? "Programando..." : "Programar nova rotina"}
+          {pendente
+            ? "Salvando..."
+            : dataVigencia === dataMinima
+              ? "Aplicar rotina agora"
+              : "Programar nova rotina"}
         </Button>
       </div>
     </form>

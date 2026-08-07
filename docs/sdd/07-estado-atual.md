@@ -3,65 +3,47 @@
 ## Ultimo checkpoint
 
 - data: 07/08/2026
-- fase atual: Fases 1 a 9 implementadas no codigo
-- status geral: Fases 8 e 9 aguardam migration consolidada e homologacao funcional
+- fase atual: ciclo de otimizacao do painel diario mobile
+- status geral: codigo implementado; migration 270 e homologacao autenticada pendentes
 
-## Implementado
+## Produto implementado
 
-- cadastro, edicao, pesquisa e arquivamento logico de alunos
-- multiplas rotinas por aluno com slots disponiveis
-- grupos individual, dupla e trio com limite de capacidade
-- agenda semanal e mensal navegavel
-- materializacao de aulas recorrentes
-- dashboard com metricas, livres, bloqueios e ranking real
-- cancelamento por participante com motivo opcional
-- regra 5x direcionada para ajuste financeiro
-- fila, sugestoes e confirmacao de reposicoes
-- catalogo semanal completo com inicios a cada 30 minutos
-- faixa configuravel para varios dias com padrao `05:00-20:00`
-- ajuste individual sem exclusao de registros e protecao de horarios ocupados
-- abertura ou bloqueio excepcional por data
-- deteccao de sobreposicao aplicada a cadastro, agenda e reposicoes
-- cadastro de rotina otimizado por dia, com apenas horarios utilizaveis visiveis
-- confirmacao pos-cadastro e identificacao dos alunos nos horarios ocupados
-- limite de um horario recorrente por dia aplicado na interface e no Zod
-- testes de integracao do cadastro com horario livre e recusa de grupo individual lotado
-- limpeza segura baseada somente nos IDs e marcadores criados pelos testes
-- migration segura para remover trigger legado de `auth.users` dependente de `public.profiles`
-- cadastro de aluno preservado mesmo quando a sincronizacao da agenda falha
-- materializacao estabilizada e autocorrecao de duplicidades legadas
-- alteracoes permanentes com vigencia futura, cancelamento e historico
-- aplicacao automatica de mudancas vencidas ao abrir agenda ou dashboard
-- financeiro com lancamentos, filtros, pagamentos e identificacao de atrasos
-- ajustes financeiros vinculados a faltas de alunos 5x
-- resumo financeiro dentro do cadastro do aluno
+- Fases 1 a 9 disponiveis no codigo
+- cadastro de alunos, rotinas, grupos individual/dupla/trio e mudancas permanentes
+- mudancas de rotina podem ser aplicadas no mesmo dia ou programadas para uma data futura
+- agenda semanal e mensal com catalogo de 30 minutos, bloqueios e aberturas
+- cancelamentos, reposicoes pendentes, sugestoes e ajustes para alunos 5x
+- financeiro basico com mensalidades, pagamentos e ajustes
+- painel diario com faixa semanal, proxima aula, restantes e horarios livres
+- linha do tempo com acoes de remanejar, cancelar, finalizar e consultar detalhes
+- selecao individual ou integral em dupla e trio
+- remanejamento pontual confirmado sem entrar na fila de pendencias
+- finalizacao manual, encerramento do dia e conclusao automatica de dias anteriores
+- navegacao movel fixa e menu lateral completo no desktop
 
-## Validacao concluida
+## Banco
 
-- `npm run lint`
+- migrations `113000` ate `260000` aplicadas no Supabase
+- migration `20260807270000_painel_diario_e_acoes_rapidas.sql` criada e pendente
+- migration 270 adiciona tipo de cancelamento, finalizacao e cinco RPCs operacionais
+
+## Validacao local concluida
+
 - `npx tsc --noEmit`
-- `npm run build`
-- rotas e contratos TypeScript sem erros
-- migrations de intervalos e catalogo confirmadas como aplicadas no Supabase
-- protecao de rota validada no navegador local sem erros de console
-- scripts de teste validados estaticamente; execucao no Supabase depende do usuario exclusivo de teste
+- `npm run lint` sem erros ou avisos
+- `npm run build` concluido com todas as rotas, incluindo `/mais` e `/agenda/aulas/[id]/remanejar`
+- protecao local de `/painel` confirmou redirecionamento para `/entrar` sem sessao
 
 ## Pendente para homologacao
 
-- executar `supabase/migrations/20260807260000_corrigir_selecao_uuid_materializacao.sql`
-- cadastrar um aluno e confirmar suas aulas na semana e no painel
-- programar uma mudanca de rotina futura e validar a aplicacao na data
-- criar mensalidade, marcar pagamento e registrar ajuste de aluno 5x
-- confirmar que rotinas duplicadas antigas foram desativadas e a agenda voltou a materializar
-- confirmar 322 registros em `disponibilidade_semanal`
-- validar segunda a sexta `05:00-20:00` ativos e demais inativos
-- aplicar nova faixa a varios dias e testar fechamento de um dia
-- abrir um almoco em uma data e confirmar que aparece na agenda/reposicoes
-- bloquear um compromisso e confirmar prioridade sobre encaixes
-- validar `13:30-14:30`: `13:00` e `14:00` indisponiveis; `14:30` livre
-- cadastrar aluno individual, dupla e trio e validar limite de capacidade
-- configurar `FITCONTROL_TEST_EMAIL` e `FITCONTROL_TEST_PASSWORD` e executar o teste de integracao
+- aplicar a migration 270 no Supabase
+- abrir `/painel` autenticado e validar dados reais do dia
+- testar remanejamento individual e integral de dupla/trio
+- confirmar que remanejamento direto nao aparece em reposicoes pendentes
+- testar cancelamento individual e integral, incluindo aluno 5x
+- testar finalizacao de aula, finalizacao do dia e correcao retroativa
+- validar visualmente em 360px, 390px, tablet e desktop
 
 ## Proxima etapa
 
-- homologacao das Fases 1 a 9 e ciclo de otimizacao de experiencia e desempenho
+- aplicar migration 270 e executar homologacao manual autenticada

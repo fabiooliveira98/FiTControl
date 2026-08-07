@@ -7,7 +7,7 @@ import {
   alteracaoRotinaSchema,
 } from "@/features/alteracoes-rotina/schemas";
 import type { EstadoAlteracaoRotina } from "@/features/alteracoes-rotina/types";
-import { obterDataAtualSaoPaulo } from "@/features/agenda/datas";
+import { obterDataAtualSaoPaulo, somarDias } from "@/features/agenda/datas";
 import { buscarSlotsCadastroAluno } from "@/features/alunos/queries";
 import { createSupabaseActionClient } from "@/lib/supabase/server";
 import { calcularHorarioFim } from "@/utils/agenda";
@@ -54,10 +54,11 @@ export async function programarAlteracaoRotinaAction(
     return { status: "erro", mensagem: dados.error.issues[0]?.message };
   }
 
-  if (dados.data.data_vigencia <= obterDataAtualSaoPaulo()) {
+  const hoje = obterDataAtualSaoPaulo();
+  if (dados.data.data_vigencia < hoje) {
     return {
       status: "erro",
-      mensagem: "Para uma mudanca programada, escolha uma data futura.",
+      mensagem: "A data da nova rotina nao pode estar no passado.",
     };
   }
 
@@ -108,6 +109,36 @@ export async function programarAlteracaoRotinaAction(
   if (erroItens) {
     await supabase.from("alteracoes_rotina_alunos").delete().eq("id", alteracao.id);
     return { status: "erro", mensagem: erroItens.message };
+  }
+
+  if (dados.data.data_vigencia === hoje) {
+    const { data: aplicada, error: erroAplicacao } = await supabase.rpc(
+      "aplicar_alteracao_rotina",
+      { p_alteracao_id: alteracao.id },
+    );
+    if (erroAplicacao || !aplicada) {
+      await supabase.from("alteracoes_rotina_alunos").delete().eq("id", alteracao.id);
+      return {
+        status: "erro",
+        mensagem:
+          erroAplicacao?.message ?? "Nao foi possivel aplicar a nova rotina agora.",
+      };
+    }
+
+    const { error: erroSincronizacao } = await supabase.rpc(
+      "materializar_aulas_periodo",
+      {
+        p_data_inicio: hoje,
+        p_data_fim: somarDias(hoje, 90),
+      },
+    );
+    revalidar(alunoId);
+    return {
+      status: "sucesso",
+      mensagem: erroSincronizacao
+        ? "Rotina alterada no banco. A agenda tentara sincronizar as aulas novamente ao ser aberta."
+        : "Nova rotina aplicada agora e aulas futuras sincronizadas.",
+    };
   }
 
   revalidar(alunoId);

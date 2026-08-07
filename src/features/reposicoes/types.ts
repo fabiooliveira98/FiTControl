@@ -12,6 +12,9 @@ export type EstadoAcaoReposicao = {
 
 export const estadoInicialReposicao: EstadoAcaoReposicao = { status: "inicial" };
 
+export type EstadoAcaoAula = EstadoAcaoReposicao;
+export const estadoInicialAcaoAula: EstadoAcaoAula = { status: "inicial" };
+
 export type ParticipanteDetalheAula = Aluno & {
   cancelamento: Cancelamento | null;
   reposicao: Reposicao | null;
@@ -28,6 +31,13 @@ export type SugestaoReposicao = {
   horario_fim: string;
   ocupacao: number;
   capacidade: number;
+};
+
+export type OpcoesRemanejamento = {
+  aula: DetalheAula;
+  aluno_ids: string[];
+  sugestoes: SugestaoReposicao[];
+  impedimento?: string;
 };
 
 export type ReposicaoPendente = {
