@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { buscarAlteracoesRotinaAluno } from "@/features/alteracoes-rotina/queries";
-import { obterDataAtualSaoPaulo, somarDias } from "@/features/agenda/datas";
+import { obterDataAtualSaoPaulo } from "@/features/agenda/datas";
 import { buscarAlunoPorId, buscarSlotsCadastroAluno } from "@/features/alunos/queries";
 import { alunoIdSchema } from "@/features/alunos/schemas";
 import { buscarMensalidades } from "@/features/mensalidades/queries";
@@ -48,8 +48,8 @@ export default async function EditarAlunoPage({
           A rotina foi salva. As proximas aulas serao mantidas sincronizadas com a agenda.
         </Alert>
       ) : retorno.atualizado === "1" ? (
-        <Alert title="Cadastro e rotina atualizados">
-          Os novos horarios ja valem para as proximas aulas.
+        <Alert title="Dados cadastrais atualizados">
+          Nome, contato, status e observacoes foram salvos. A rotina e alterada na secao propria abaixo.
         </Alert>
       ) : null}
 
@@ -72,12 +72,12 @@ export default async function EditarAlunoPage({
       <Card className="p-5 sm:p-7">
         <CardTitle>Alteracao permanente de rotina</CardTitle>
         <CardDescription className="mt-2 mb-6">
-          Defina a nova semana e quando ela comeca. Ate a data escolhida, os horarios atuais continuam valendo.
+          Salve com a data de hoje para aplicar agora ou escolha uma data futura para programar a mudanca.
         </CardDescription>
         <FormularioAlteracaoRotina
           aluno={aluno}
           slots={slots}
-          dataMinima={somarDias(obterDataAtualSaoPaulo(), 1)}
+          dataMinima={obterDataAtualSaoPaulo()}
         />
       </Card>
 

@@ -16,6 +16,8 @@ export default async function PainelLayout({
     if (!user) {
       redirect("/entrar");
     }
+
+    await supabase.rpc("finalizar_aulas_anteriores");
   }
 
   return <AppShell>{children}</AppShell>;

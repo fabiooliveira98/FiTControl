@@ -5,6 +5,7 @@ import type {
   BloqueioAgenda,
   DiaSemana,
   DisponibilidadeSemanal,
+  TipoCancelamento,
 } from "@/types/dominio";
 
 export type ParticipanteAgenda = {
@@ -13,6 +14,7 @@ export type ParticipanteAgenda = {
   treina_segunda_a_sexta: boolean;
   cancelado: boolean;
   motivo_cancelamento: string | null;
+  tipo_cancelamento: TipoCancelamento | null;
 };
 
 export type AulaAgenda = Aula & {

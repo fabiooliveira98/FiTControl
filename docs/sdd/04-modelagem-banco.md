@@ -28,7 +28,9 @@
 - `aulas` representa ocorrencias concretas das rotinas
 - `alunos_aulas` preserva o snapshot de participantes por ocorrencia
 - cancelamento aponta para aula e aluno
+- cancelamento diferencia `FALTA` de `REMANEJAMENTO`
 - reposicao aponta para o cancelamento e, quando confirmada, para a aula de destino
+- aula registra quando foi finalizada e se a finalizacao ocorreu automaticamente
 - alteracao de rotina aponta para o aluno, a data de vigencia e seu status
 - itens de alteracao guardam o snapshot completo da nova semana
 - rotina recorrente registra inicio, fim de vigencia e alteracao que a originou
@@ -68,6 +70,17 @@
 - `confirmar_reposicao`: valida destino recorrente ou excepcional e agenda a reposicao
 - `aplicar_alteracao_rotina`: troca a rotina na data correta e preserva a versao anterior
 - `aplicar_alteracoes_rotina_pendentes`: processa mudancas vencidas sem bloquear as demais
+- `cancelar_participacoes_aula`: registra falta de um ou varios participantes atomicamente
+- `remanejar_participacoes_aula`: move participantes e registra origem/destino resolvidos
+- `finalizar_aula`: conclui uma ocorrencia manualmente
+- `finalizar_dia`: conclui todas as ocorrencias restantes de uma data
+- `finalizar_aulas_anteriores`: conclui ocorrencias antigas na proxima abertura
+
+## Campos do painel diario
+
+- `aulas.finalizada_em`: instante da conclusao manual ou automatica
+- `aulas.finalizacao_automatica`: diferencia o encerramento feito pelo sistema
+- `cancelamentos.tipo`: enum `FALTA` ou `REMANEJAMENTO`
 
 ## Migrations
 
@@ -79,7 +92,8 @@
 6. `20260807230000_reparar_materializacao_agenda.sql`: regra incorporada pela migration consolidada
 7. `20260807240000_remover_trigger_profiles_legado.sql`: aplicada no Supabase em 07/08/2026
 8. `20260807250000_fases_8_9_e_estabilizacao_agenda.sql`: aplicada no Supabase em 07/08/2026
-9. `20260807260000_corrigir_selecao_uuid_materializacao.sql`: criada; aplicacao remota pendente
+9. `20260807260000_corrigir_selecao_uuid_materializacao.sql`: aplicada e homologada no Supabase em 07/08/2026
+10. `20260807270000_painel_diario_e_acoes_rapidas.sql`: criada; aplicacao remota pendente
 
 ## Catalogo inicial
 

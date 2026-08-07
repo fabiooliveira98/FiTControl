@@ -5,9 +5,16 @@ import { revalidatePath } from "next/cache";
 import {
   cancelamentoSchema,
   confirmacaoReposicaoSchema,
+  finalizacaoAulaSchema,
+  finalizacaoDiaSchema,
+  participantesAulaSchema,
+  remanejamentoAulaSchema,
   reposicaoIdSchema,
 } from "@/features/reposicoes/schemas";
-import type { EstadoAcaoReposicao } from "@/features/reposicoes/types";
+import type {
+  EstadoAcaoAula,
+  EstadoAcaoReposicao,
+} from "@/features/reposicoes/types";
 import { createSupabaseActionClient } from "@/lib/supabase/server";
 
 async function clienteAutenticado() {
@@ -63,6 +70,129 @@ export async function cancelarParticipacaoAction(
   revalidarOperacao();
   revalidatePath(`/agenda/aulas/${aulaId}`);
   return { status: "sucesso", mensagem: "Cancelamento registrado." };
+}
+
+export async function cancelarParticipacoesAction(
+  aulaId: string,
+  alunoIds: string[],
+  _estado: EstadoAcaoAula,
+  formData: FormData,
+): Promise<EstadoAcaoAula> {
+  const dados = participantesAulaSchema.safeParse({
+    aula_id: aulaId,
+    aluno_ids: alunoIds,
+    motivo: formData.get("motivo"),
+  });
+  if (!dados.success) {
+    return { status: "erro", mensagem: dados.error.issues[0]?.message };
+  }
+
+  const supabase = await clienteAutenticado();
+  if (!supabase) return { status: "erro", mensagem: "Sua sessao expirou." };
+
+  const { error } = await supabase.rpc("cancelar_participacoes_aula", {
+    p_aula_id: dados.data.aula_id,
+    p_aluno_ids: dados.data.aluno_ids,
+    p_motivo: dados.data.motivo || null,
+  });
+  if (error) return { status: "erro", mensagem: traduzirErro(error.message) };
+
+  revalidarOperacao();
+  revalidatePath(`/agenda/aulas/${aulaId}`);
+  return {
+    status: "sucesso",
+    mensagem:
+      alunoIds.length > 1 ? "Cancelamentos registrados." : "Cancelamento registrado.",
+  };
+}
+
+export async function remanejarParticipacoesAction(
+  aulaId: string,
+  alunoIds: string[],
+  _estado: EstadoAcaoAula,
+  formData: FormData,
+): Promise<EstadoAcaoAula> {
+  const dados = remanejamentoAulaSchema.safeParse({
+    aula_id: aulaId,
+    aluno_ids: alunoIds,
+    data: formData.get("data"),
+    horario_inicio: formData.get("horario_inicio"),
+    motivo: formData.get("motivo"),
+  });
+  if (!dados.success) {
+    return { status: "erro", mensagem: dados.error.issues[0]?.message };
+  }
+
+  const supabase = await clienteAutenticado();
+  if (!supabase) return { status: "erro", mensagem: "Sua sessao expirou." };
+
+  const { error } = await supabase.rpc("remanejar_participacoes_aula", {
+    p_aula_origem_id: dados.data.aula_id,
+    p_aluno_ids: dados.data.aluno_ids,
+    p_data: dados.data.data,
+    p_horario_inicio: dados.data.horario_inicio,
+    p_motivo: dados.data.motivo || null,
+  });
+  if (error) return { status: "erro", mensagem: traduzirErro(error.message) };
+
+  revalidarOperacao();
+  revalidatePath(`/agenda/aulas/${aulaId}`);
+  return { status: "sucesso", mensagem: "Aula remanejada e confirmada na agenda." };
+}
+
+export async function finalizarAulaAction(
+  aulaId: string,
+  _estado: EstadoAcaoAula,
+  _formData: FormData,
+): Promise<EstadoAcaoAula> {
+  void _estado;
+  void _formData;
+  const dados = finalizacaoAulaSchema.safeParse({ aula_id: aulaId });
+  if (!dados.success) {
+    return { status: "erro", mensagem: dados.error.issues[0]?.message };
+  }
+
+  const supabase = await clienteAutenticado();
+  if (!supabase) return { status: "erro", mensagem: "Sua sessao expirou." };
+
+  const { data, error } = await supabase.rpc("finalizar_aula", {
+    p_aula_id: dados.data.aula_id,
+  });
+  if (error) return { status: "erro", mensagem: traduzirErro(error.message) };
+  if (!data) return { status: "erro", mensagem: "A aula nao pode ser finalizada agora." };
+
+  revalidarOperacao();
+  revalidatePath(`/agenda/aulas/${aulaId}`);
+  return { status: "sucesso", mensagem: "Aula finalizada." };
+}
+
+export async function finalizarDiaAction(
+  data: string,
+  _estado: EstadoAcaoAula,
+  _formData: FormData,
+): Promise<EstadoAcaoAula> {
+  void _estado;
+  void _formData;
+  const dados = finalizacaoDiaSchema.safeParse({ data });
+  if (!dados.success) {
+    return { status: "erro", mensagem: dados.error.issues[0]?.message };
+  }
+
+  const supabase = await clienteAutenticado();
+  if (!supabase) return { status: "erro", mensagem: "Sua sessao expirou." };
+
+  const { data: total, error } = await supabase.rpc("finalizar_dia", {
+    p_data: dados.data.data,
+  });
+  if (error) return { status: "erro", mensagem: traduzirErro(error.message) };
+
+  revalidarOperacao();
+  return {
+    status: "sucesso",
+    mensagem: total
+      ? `${total} aula(s) finalizada(s).`
+      : "Todas as aulas desse dia ja estavam finalizadas.",
+  };
 }
 
 export async function confirmarReposicaoAction(
