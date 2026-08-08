@@ -52,6 +52,33 @@ Os tokens em `src/app/globals.css` sao a fonte tecnica das cores ajustadas no pr
 - o toque no cartao abre acoes em `BottomSheet`, sem drag-and-drop
 - alvos interativos principais possuem pelo menos 44px de altura
 
+## Proximo ciclo de UX
+
+- reduzir atrito nas acoes de maior frequencia: cancelar, remanejar, finalizar e consultar detalhes
+- tratar `/painel` como superficie principal de operacao no celular
+- manter `/agenda` como superficie ampla para organizar semana e mes
+- revisar cadastro e edicao de rotina para diminuir listas longas e decisoes repetidas
+- preferir componentes reutilizaveis e pequenos, sem duplicar padroes visuais por tela
+- estados de aula devem ser compreensiveis por texto, hierarquia, contraste e posicao, nao apenas por cor
+- qualquer novo componente base relevante deve atualizar este documento
+
+## Fase B.1: card da aula e acoes rapidas
+
+- `CartaoAulaDia` prioriza leitura rapida: horario, status, participantes ativos, ocupacao e proxima acao
+- estados `Proxima`, `Em andamento` e `Finalizacao pendente` recebem maior destaque visual no painel
+- participantes cancelados aparecem de forma secundaria para nao poluir a linha do tempo
+- `AcoesAulaBottomSheet` concentra o menu de acoes da aula e reduz etapas em aulas individuais
+- aulas em andamento ou pendentes priorizam finalizacao; aulas futuras priorizam remanejamento e cancelamento
+- dupla e trio continuam exigindo escolha de participante ou grupo inteiro antes de cancelar/remanejar
+
+## Fase B.2: historico e clareza de vigencia
+
+- historico de mudancas de rotina mostra inicialmente apenas as duas mudancas mais recentes
+- a tela informa quantos registros foram exibidos em relacao ao total preservado
+- textos de vigencia explicam que a rotina atual vale ate o dia anterior da nova data
+- formulario de alteracao permanente reforca que a mudanca cria uma nova versao da rotina
+- paginacao completa do historico fica planejada para uma evolucao futura
+
 ## Interface publica
 
 - `components/marketing` concentra cabecalho, previa da agenda, beneficios e rodape

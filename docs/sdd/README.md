@@ -1,6 +1,6 @@
 # SDD do FitControl
 
-Este diretório é a fonte oficial de verdade do projeto.
+Este diretorio e a fonte oficial de verdade do projeto.
 
 ## Ordem de leitura recomendada
 
@@ -14,16 +14,18 @@ Este diretório é a fonte oficial de verdade do projeto.
 8. `08-decisoes-arquiteturais.md`
 9. `09-processo-de-atualizacao.md`
 10. `10-testes-automatizados.md`
+11. `roadmap/2026-08-evolucao-saas-ux-ia.md`
 
-## Uso prático
+## Uso pratico
 
 - Antes de implementar uma fase: revisar `06-plano-de-fases.md`.
-- Durante a implementação: validar se banco, regras e arquitetura continuam coerentes.
-- Ao concluir uma entrega: atualizar `07-estado-atual.md` e os documentos temáticos afetados.
-- Ao tomar decisão importante: registrar em `08-decisoes-arquiteturais.md`.
+- Para o novo ciclo SaaS/UX/IA: revisar `roadmap/2026-08-evolucao-saas-ux-ia.md`.
+- Durante a implementacao: validar se banco, regras e arquitetura continuam coerentes.
+- Ao concluir uma entrega: atualizar `07-estado-atual.md` e os documentos tematicos afetados.
+- Ao tomar decisao importante: registrar em `08-decisoes-arquiteturais.md`.
 
 ## Estado atual
 
-O checkpoint mais recente do projeto está em `07-estado-atual.md`.
+O checkpoint mais recente do projeto esta em `07-estado-atual.md`.
 
 Checkpoints detalhados de entrega ficam em `fases/`.

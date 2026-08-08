@@ -69,3 +69,56 @@ Status: implementado no codigo; migration e homologacao autenticada pendentes.
 - remanejamento pontual resolvido sem criar pendencia
 - finalizacao manual, por dia e automatica para datas anteriores
 - navegacao movel fixa e pagina `/mais`
+
+## Novo ciclo. Evolucao SaaS, UX e IA
+
+Status: planejado e documentado; sem implementacao de codigo ou banco iniciada.
+
+Roteiro central: `docs/sdd/roadmap/2026-08-evolucao-saas-ux-ia.md`.
+
+### Fase A. Documentacao da evolucao
+
+Objetivo: registrar a trilha aprovada antes de alterar codigo ou banco.
+
+- atualizar SDD com arquitetura atual, arquitetura alvo e riscos
+- documentar isolamento por `personal_id`
+- documentar portal simples do aluno por convite
+- registrar IA e WhatsApp como visao futura
+
+### Fase B. Melhorias de UI e reducao de atrito
+
+Objetivo: melhorar o uso diario com menor risco tecnico.
+
+- refinar `/painel` como tela principal no celular
+- reduzir cliques para cancelar, remanejar e finalizar aulas
+- melhorar leitura dos cards, estados e horarios livres
+- revisar cadastro e edicao de rotina do aluno
+- preservar desktop robusto para semana e mes
+
+### Fase C. Isolamento SaaS por personal
+
+Objetivo: preparar o sistema para que cada personal acesse somente os proprios dados.
+
+- adicionar `personal_id` nas tabelas operacionais
+- atribuir dados existentes ao usuario atual da personal
+- trocar RLS ampla por RLS baseada em `auth.uid() = personal_id`
+- revisar RPCs, queries e actions para respeitar o dono dos dados
+- testar isolamento com duas contas de personal
+
+### Fase D. Portal simples do aluno por convite
+
+Objetivo: permitir consulta limitada pelo aluno sem expor a agenda interna da personal.
+
+- criar vinculo de acesso entre usuario autenticado e aluno
+- usar convite/link como entrada inicial
+- permitir somente leitura das proprias aulas, reposicoes e cancelamentos
+- manter queries e telas separadas das telas internas da personal
+
+### Fase E. IA e WhatsApp como roadmap futuro
+
+Objetivo: registrar possibilidades de automacao antes de implementar integracoes externas.
+
+- interpretar mensagens para cancelar, consultar e reagendar aulas
+- exigir confirmacao antes de mudancas sensiveis
+- registrar auditoria de toda acao feita por assistente
+- executar somente depois do isolamento SaaS estar seguro

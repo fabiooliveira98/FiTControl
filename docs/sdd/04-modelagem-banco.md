@@ -54,6 +54,63 @@
 - cada mudanca possui no maximo um horario por dia da semana
 - cada cancelamento possui no maximo um lancamento de ajuste financeiro
 
+## Evolucao SaaS planejada
+
+O modelo atual ainda e mono-personal. Para evoluir com seguranca para SaaS, as tabelas operacionais devem receber isolamento por dono dos dados.
+
+Campo planejado:
+
+- `personal_id uuid not null references auth.users(id)`
+
+Tabelas que devem receber ou derivar `personal_id`:
+
+- `alunos`
+- `disponibilidade_semanal`
+- `bloqueios_agenda`
+- `aberturas_agenda`
+- `grupos_aula`
+- `integrantes_grupos_aula`
+- `horarios_recorrentes_alunos`
+- `aulas`
+- `alunos_aulas`
+- `cancelamentos`
+- `reposicoes`
+- `mensalidades`
+- `alteracoes_rotina_alunos`
+- `itens_alteracao_rotina`
+
+Diretriz de RLS:
+
+- personal autenticada acessa somente registros em que `auth.uid() = personal_id`
+- registros filhos devem validar propriedade pela tabela pai quando nao carregarem `personal_id` diretamente
+- RPCs devem validar `personal_id` internamente antes de alterar dados relacionados
+- dados existentes devem ser atribuidos ao usuario atual da personal na primeira migracao multiusuario
+
+## Portal do aluno planejado
+
+Tabela planejada:
+
+- `acessos_alunos`
+
+Campos previstos:
+
+- `id`
+- `personal_id`
+- `aluno_id`
+- `usuario_id`
+- `status`
+- `convite_token_hash`
+- `convite_expira_em`
+- `created_at`
+- `updated_at`
+
+Regras de acesso do aluno:
+
+- aluno acessa apenas dados ligados ao proprio `aluno_id`
+- aluno nao acessa agenda completa da personal
+- aluno nao acessa outros alunos
+- aluno nao altera rotinas, aulas ou financeiro na primeira versao do portal
+
 ## Funcoes
 
 - `atualizar_updated_at`: mantem timestamps

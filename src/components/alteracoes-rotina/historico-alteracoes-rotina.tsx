@@ -1,5 +1,5 @@
 import { cancelarAlteracaoRotinaAction } from "@/features/alteracoes-rotina/actions";
-import type { AlteracaoRotinaComItens } from "@/features/alteracoes-rotina/types";
+import type { HistoricoAlteracoesRotinaResumo } from "@/features/alteracoes-rotina/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatarDiaSemana, formatarHorario } from "@/utils/agenda";
@@ -10,11 +10,14 @@ function formatarData(data: string) {
 
 export function HistoricoAlteracoesRotina({
   alunoId,
-  alteracoes,
+  historico,
 }: {
   alunoId: string;
-  alteracoes: AlteracaoRotinaComItens[];
+  historico: HistoricoAlteracoesRotinaResumo;
 }) {
+  const { alteracoes, total, limite } = historico;
+  const existemMaisRegistros = total > alteracoes.length;
+
   if (!alteracoes.length) {
     return (
       <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-center text-sm text-foreground/55">
@@ -25,6 +28,16 @@ export function HistoricoAlteracoesRotina({
 
   return (
     <div className="space-y-3">
+      <div className="rounded-2xl border border-border bg-surface-muted px-4 py-3">
+        <p className="text-sm font-semibold">
+          Mostrando {alteracoes.length} de {total} mudanca(s) mais recente(s)
+        </p>
+        <p className="mt-1 text-xs leading-5 text-foreground/55">
+          O historico completo fica preservado no banco. A tela mostra apenas as ultimas {limite}
+          para manter a leitura leve.
+        </p>
+      </div>
+
       {alteracoes.map((alteracao) => (
         <article key={alteracao.id} className="rounded-2xl border border-border bg-white p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -66,6 +79,13 @@ export function HistoricoAlteracoesRotina({
           </div>
         </article>
       ))}
+
+      {existemMaisRegistros ? (
+        <p className="rounded-2xl border border-dashed border-border-strong px-4 py-3 text-center text-xs text-foreground/55">
+          Existem mudancas antigas registradas. A paginacao completa fica planejada para a proxima
+          evolucao deste historico.
+        </p>
+      ) : null}
     </div>
   );
 }

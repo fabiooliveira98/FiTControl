@@ -70,3 +70,31 @@
 - contexto: a personal pode esquecer de finalizar aulas ou encerrar o dia
 - decisao: concluir aulas anteriores na proxima abertura autenticada e manter botao manual para o dia atual
 - impacto: o historico converge sem infraestrutura de agendamento e continua aceitando correcoes retroativas
+
+## DA-011 - Evolucao SaaS com uma personal por conta
+
+- data: 08/08/2026
+- contexto: o produto pode evoluir para SaaS, mas a arquitetura atual ainda considera uma unica personal operacional
+- decisao: planejar primeiro o modelo de uma personal por conta, usando `personal_id` como dono dos dados
+- impacto: reduz complexidade inicial e cria a base minima para isolamento seguro entre usuarios
+
+## DA-012 - RLS por dono dos dados antes de SaaS real
+
+- data: 08/08/2026
+- contexto: login por si so nao impede que um usuario autenticado acesse dados de outro se as politicas forem amplas
+- decisao: antes de uso multiusuario real, tabelas operacionais e RPCs devem validar `auth.uid() = personal_id`
+- impacto: a migracao multiusuario sera tratada como fase propria, com testes de isolamento usando duas contas
+
+## DA-013 - Portal do aluno por convite e consulta limitada
+
+- data: 08/08/2026
+- contexto: foi solicitada uma forma simples para o aluno ver informacoes proprias, como reposicoes
+- decisao: planejar portal do aluno por convite/link, separado das telas internas da personal
+- impacto: aluno tera permissao minima, vinculada ao proprio cadastro, sem acesso a agenda completa ou dados de outros alunos
+
+## DA-014 - IA e WhatsApp como roadmap futuro
+
+- data: 08/08/2026
+- contexto: mensagens simples podem reduzir ainda mais o trabalho manual da personal no futuro
+- decisao: documentar WhatsApp assistente como visao futura, sem implementacao antes do isolamento SaaS
+- impacto: automacoes futuras deverao exigir confirmacao, respeitar permissoes e registrar auditoria

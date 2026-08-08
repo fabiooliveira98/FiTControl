@@ -26,7 +26,7 @@ export default async function EditarAlunoPage({
   const retorno = await searchParams;
   if (!alunoIdSchema.safeParse(id).success) notFound();
 
-  const [aluno, slots, alteracoes, mensalidades] = await Promise.all([
+  const [aluno, slots, historicoAlteracoes, mensalidades] = await Promise.all([
     buscarAlunoPorId(id),
     buscarSlotsCadastroAluno(id),
     buscarAlteracoesRotinaAluno(id),
@@ -72,7 +72,8 @@ export default async function EditarAlunoPage({
       <Card className="p-5 sm:p-7">
         <CardTitle>Alteracao permanente de rotina</CardTitle>
         <CardDescription className="mt-2 mb-6">
-          Salve com a data de hoje para aplicar agora ou escolha uma data futura para programar a mudanca.
+          A rotina atual vale ate o dia anterior da vigencia escolhida. Salve com a data de hoje
+          para aplicar agora ou escolha uma data futura para programar.
         </CardDescription>
         <FormularioAlteracaoRotina
           aluno={aluno}
@@ -84,9 +85,10 @@ export default async function EditarAlunoPage({
       <Card className="p-5 sm:p-7">
         <CardTitle>Historico de mudancas</CardTitle>
         <CardDescription className="mt-2 mb-5">
-          Mudancas agendadas podem ser canceladas antes da vigencia; aplicadas permanecem registradas.
+          A tela mostra as mudancas mais recentes para evitar leitura longa. Mudancas aplicadas
+          permanecem registradas e agendadas podem ser canceladas antes da vigencia.
         </CardDescription>
-        <HistoricoAlteracoesRotina alunoId={aluno.id} alteracoes={alteracoes} />
+        <HistoricoAlteracoesRotina alunoId={aluno.id} historico={historicoAlteracoes} />
       </Card>
 
       <Card className="p-5 sm:p-7">
