@@ -36,6 +36,30 @@
 - Server Components usam cliente sem escrita de cookies
 - Server Actions usam cliente autorizado a atualizar cookies
 
+## Arquitetura atual de acesso
+
+- o produto esta implementado como operacao de uma unica personal
+- rotas internas exigem usuario autenticado
+- RLS atual protege contra acesso anonimo, mas ainda nao isola dados por personal
+- queries e RPCs assumem um unico conjunto operacional de alunos, agenda e financeiro
+
+## Arquitetura alvo SaaS
+
+- cada personal tera dados isolados por `personal_id`
+- `personal_id` deve apontar para `auth.users.id`
+- toda tabela operacional relevante devera carregar o dono dos dados direta ou indiretamente
+- politicas RLS devem usar `auth.uid() = personal_id`
+- RPCs devem validar o dono dos registros antes de alterar agenda, alunos, reposicoes ou financeiro
+- dados existentes serao atribuidos ao usuario atual da personal na migracao inicial
+
+## Portal do aluno planejado
+
+- aluno tera uma conta propria apenas para consulta simples
+- o acesso sera concedido por convite/link gerado pela personal
+- uma tabela de vinculo, como `acessos_alunos`, ligara usuario autenticado, aluno e personal
+- telas e queries do aluno devem ser separadas das telas internas da personal
+- o aluno nao deve acessar agenda completa, lista de alunos, configuracoes ou financeiro da personal
+
 ## Features implementadas
 
 - `features/alunos`: CRUD, slots validos, grupos e rotinas recorrentes
@@ -80,3 +104,11 @@
 - a finalizacao automatica roda novamente depois da materializacao
 - falha de materializacao nao apaga um aluno ja cadastrado
 - a migration de estabilizacao repara duplicidades legadas antes da materializacao
+
+## IA e WhatsApp planejados
+
+- integracao com WhatsApp fica registrada como roadmap futuro
+- a IA deve interpretar intencoes como cancelar, consultar horarios livres e solicitar remanejamento
+- mudancas sensiveis exigem confirmacao antes de alterar o banco
+- toda acao automatizada deve gerar historico/auditoria
+- nenhuma automacao deve ser implementada antes do isolamento por personal estar validado

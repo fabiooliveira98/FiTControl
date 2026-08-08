@@ -38,6 +38,8 @@
 - a rotina atual permanece valida ate o dia anterior a nova vigencia
 - mudancas aplicadas desativam a versao anterior sem excluir seus registros
 - mudancas agendadas podem ser canceladas antes da data de vigencia
+- a tela do aluno mostra inicialmente apenas as mudancas de rotina mais recentes
+- o historico completo de rotina permanece preservado no banco para consulta futura
 - aulas anteriores preservam o snapshot de participantes
 
 ## Dashboard

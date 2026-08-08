@@ -2,9 +2,9 @@
 
 ## Ultimo checkpoint
 
-- data: 07/08/2026
-- fase atual: ciclo de otimizacao do painel diario mobile
-- status geral: codigo implementado; migration 270 e homologacao autenticada pendentes
+- data: 08/08/2026
+- fase atual: planejamento de evolucao SaaS, UX e IA
+- status geral: ciclo documentado; sem implementacao de codigo ou banco iniciada neste ciclo
 
 ## Produto implementado
 
@@ -22,12 +22,16 @@
 - navegacao movel fixa e menu lateral completo no desktop
 - landing comercial responsiva com proposta de valor e previa animada da agenda
 - login integrado a identidade comercial, com formulario prioritario no mobile
+- Fase B.1 iniciada com card de aula mais limpo e bottom sheet de acoes rapidas reorganizado
+- Fase B.2 adicionada com historico recente de rotina e textos mais claros sobre vigencia
 
 ## Banco
 
 - migrations `113000` ate `260000` aplicadas no Supabase
 - migration `20260807270000_painel_diario_e_acoes_rapidas.sql` criada e pendente
 - migration 270 adiciona tipo de cancelamento, finalizacao e cinco RPCs operacionais
+- isolamento por `personal_id` planejado para fase futura, ainda nao implementado
+- portal do aluno por convite planejado para fase futura, ainda nao implementado
 
 ## Validacao local concluida
 
@@ -48,4 +52,6 @@
 
 ## Proxima etapa
 
-- aplicar migration 270 e executar homologacao manual autenticada
+- escolher uma fase do roadmap `docs/sdd/roadmap/2026-08-evolucao-saas-ux-ia.md`
+- recomendacao atual: continuar a Fase B com melhorias no painel diario, horarios livres e cadastro de rotina
+- antes da Fase C, revisar com cuidado migration, RLS, RPCs e testes de isolamento

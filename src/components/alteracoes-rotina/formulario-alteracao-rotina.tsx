@@ -65,8 +65,8 @@ export function FormularioAlteracaoRotina({
           label="Aplicar em"
           hint={
             dataVigencia === dataMinima
-              ? "A mudanca sera aplicada assim que voce salvar."
-              : "A rotina atual continua valendo ate o dia anterior."
+              ? "A nova rotina entra hoje e passa a valer para as proximas aulas."
+              : "A rotina atual continua valendo ate o dia anterior da data escolhida."
           }
         >
           <Input
@@ -90,6 +90,11 @@ export function FormularioAlteracaoRotina({
         onChange={setSelecionados}
         desabilitado={pendente}
       />
+
+      <Alert title="Como funciona a vigencia" tone="info">
+        A mudanca cria uma nova versao da rotina. O historico antigo nao e apagado; ele recebe uma
+        data final e a nova rotina comeca na data escolhida.
+      </Alert>
 
       {estado.status !== "inicial" ? (
         <Alert

@@ -15,3 +15,9 @@ export const estadoInicialAlteracaoRotina: EstadoAlteracaoRotina = {
 export type AlteracaoRotinaComItens = AlteracaoRotinaAluno & {
   itens: ItemAlteracaoRotina[];
 };
+
+export type HistoricoAlteracoesRotinaResumo = {
+  alteracoes: AlteracaoRotinaComItens[];
+  total: number;
+  limite: number;
+};

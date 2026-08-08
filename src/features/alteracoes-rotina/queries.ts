@@ -1,18 +1,23 @@
-import type { AlteracaoRotinaComItens } from "@/features/alteracoes-rotina/types";
+import type { HistoricoAlteracoesRotinaResumo } from "@/features/alteracoes-rotina/types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AlteracaoRotinaAluno, ItemAlteracaoRotina } from "@/types/dominio";
 
 export async function buscarAlteracoesRotinaAluno(
   alunoId: string,
-): Promise<AlteracaoRotinaComItens[]> {
+  limite = 2,
+): Promise<HistoricoAlteracoesRotinaResumo> {
   const supabase = await createSupabaseServerClient();
-  const { data: alteracoes, error } = await supabase
+  const { data: alteracoes, error, count } = await supabase
     .from("alteracoes_rotina_alunos")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("aluno_id", alunoId)
-    .order("data_vigencia", { ascending: false });
+    .order("data_vigencia", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(limite);
 
-  if (error || !alteracoes?.length) return [];
+  if (error || !alteracoes?.length) {
+    return { alteracoes: [], total: count ?? 0, limite };
+  }
 
   const alteracoesBase = alteracoes as AlteracaoRotinaAluno[];
   const { data: itens } = await supabase
@@ -25,10 +30,14 @@ export async function buscarAlteracoesRotinaAluno(
     .order("dia_semana")
     .order("horario_inicio");
 
-  return alteracoesBase.map((alteracao) => ({
-    ...alteracao,
-    itens: ((itens ?? []) as ItemAlteracaoRotina[]).filter(
-      (item) => item.alteracao_rotina_id === alteracao.id,
-    ),
-  }));
+  return {
+    alteracoes: alteracoesBase.map((alteracao) => ({
+      ...alteracao,
+      itens: ((itens ?? []) as ItemAlteracaoRotina[]).filter(
+        (item) => item.alteracao_rotina_id === alteracao.id,
+      ),
+    })),
+    total: count ?? alteracoesBase.length,
+    limite,
+  };
 }
